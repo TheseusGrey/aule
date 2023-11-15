@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from modelHost.utils.conversationHelpers import Context
 
 
 @dataclass
@@ -7,7 +8,7 @@ class Event:
   
 @dataclass
 class ContextSwitchEvent:
-    context: str
+    context: Context
     type: str = 'context-switch'
 
 @dataclass
