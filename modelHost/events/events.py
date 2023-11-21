@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from modelHost.utils.conversationHelpers import Context
+from utils.conversationHelpers import Context
 
 
 @dataclass

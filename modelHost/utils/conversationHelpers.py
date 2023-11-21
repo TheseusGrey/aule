@@ -1,5 +1,5 @@
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import List, Optional
 
 
@@ -12,7 +12,7 @@ class Context:
     task: Optional[str] = None
     subTask: Optional[str] = None
     activeFocus: Optional[str] = None
-    gatheredKnowledge: List[str] = []
+    gatheredKnowledge: List[str] = field(default_factory=list)
     def __str__(self) -> str:
         return f"""
 - Device: {self.device}
