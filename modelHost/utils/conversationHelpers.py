@@ -1,33 +1,11 @@
 
-from dataclasses import dataclass, field
-from typing import List, Optional
-
-
-
-@dataclass
-class Context:
-    device: Optional[str] = None
-    application: Optional[str] = None
-    subject: Optional[str] = None
-    task: Optional[str] = None
-    subTask: Optional[str] = None
-    activeFocus: Optional[str] = None
-    gatheredKnowledge: List[str] = field(default_factory=list)
-    def __str__(self) -> str:
-        return f"""
-- Device: {self.device}
-- Application: {self.application}
-- Subject: {self.subject}
-- Task: {self.task}
-- Subtask: {self.subTask}
-- Active Focus: {self.activeFocus}
-- Gathered Knowledge: {" ".join(self.gatheredKnowledge)}
-"""
+from dataclasses import dataclass
 
 @dataclass
 class Conversation:
   history: str
-  context: Context
+  context: str = ""
+  previousContext: str = ""
   contextUpdated: bool = False
 
 
