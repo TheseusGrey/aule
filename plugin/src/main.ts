@@ -1,5 +1,6 @@
 import {
 	App,
+	Modal,
 	Notice,
 	Plugin,
 	PluginSettingTab,
@@ -18,9 +19,16 @@ export default class Aule extends Plugin {
 	settings: AuleSettings;
 	modelHost: WebSocket;
 	
+	
+	
 	async onload() {
 		await this.loadSettings();
 		this.modelHost = new WebSocket(this.settings.modelHostUrl);
+		
+		this.modelHost.onmessage = event => {
+			console.log(event.data)
+		}
+
 		// This creates an icon in the left ribbon.
 		const ribbonIconEl = this.addRibbonIcon(
 			"dice",
@@ -39,9 +47,11 @@ export default class Aule extends Plugin {
 
 		this.addCommand({
 			id: "test-aule",
-			name: "Run Pipeline",
-			callback: async () => {
-				this.modelHost.send("TESTING STUFF")
+			name: "Prompt Aule",
+			callback: () => {
+				new ExampleModal(this.app, result => {
+					this.modelHost.send(`lsn:: ${result}`)
+				}).open()
 			},
 		});
 
@@ -58,8 +68,11 @@ export default class Aule extends Plugin {
 		this.registerInterval(
 			window.setInterval(() => console.log("setInterval"), 5 * 60 * 1000)
 		);
+		console.log("Aule: Connection to Language Model established.")
 	}
 
+
+	
 	onunload() {}
 
 	async loadSettings() {
@@ -75,6 +88,43 @@ export default class Aule extends Plugin {
 	}
 }
 
+export class ExampleModal extends Modal {
+  result: string;
+  onSubmit: (result: string) => void;
+
+  constructor(app: App, onSubmit: (result: string) => void) {
+    super(app);
+    this.onSubmit = onSubmit;
+  }
+
+  onOpen() {
+    const { contentEl } = this;
+
+    contentEl.createEl("h1", { text: "Test Prompt:" });
+
+    new Setting(contentEl)
+      .setName("Prompt:")
+      .addText((text) =>
+        text.onChange((value) => {
+          this.result = value
+        }));
+
+    new Setting(contentEl)
+      .addButton((btn) =>
+        btn
+          .setButtonText("Submit")
+          .setCta()
+          .onClick(() => {
+            this.close();
+            this.onSubmit(this.result);
+          }));
+  }
+
+  onClose() {
+    const { contentEl } = this;
+    contentEl.empty();
+  }
+}
 
 class SampleSettingTab extends PluginSettingTab {
 	plugin: Aule;

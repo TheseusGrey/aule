@@ -7,7 +7,6 @@ from uuid import UUID
 import torch
 import websockets
 from transformers import AutoModelForCausalLM, AutoTokenizer
-from handlers.contextSwitchHandler import updateContext
 from handlers.listenHandler import listen
 from utils.conversationHelpers import Conversation, formatPrompt, initialiseConversation, provideContextToModel
 
@@ -29,7 +28,7 @@ async def handler(websocket: websockets.WebSocketServerProtocol):
     while True:
         try:
             message = await websocket.recv()
-            print("Incoming message: {}.".format(message))
+            print('Incoming message: "{}".'.format(message))
             assert isinstance(message, str)
             [eventType, data] = message.split("::", 1)
 
