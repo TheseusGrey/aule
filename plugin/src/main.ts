@@ -6,6 +6,7 @@ import {
 	PluginSettingTab,
 	Setting,
 } from "obsidian";
+import { auleBubblePlugin } from "./speechBubble/view";
 
 interface AuleSettings {
 	modelHostUrl: string;
@@ -19,16 +20,14 @@ export default class Aule extends Plugin {
 	settings: AuleSettings;
 	modelHost: WebSocket;
 	
-	
-	
 	async onload() {
 		await this.loadSettings();
+		this.registerEditorExtension([auleBubblePlugin])
 		this.modelHost = new WebSocket(this.settings.modelHostUrl);
-		
 		this.modelHost.onmessage = event => {
 			console.log(event.data)
 		}
-
+		
 		// This creates an icon in the left ribbon.
 		const ribbonIconEl = this.addRibbonIcon(
 			"dice",
