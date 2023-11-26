@@ -11,7 +11,6 @@ import {
 import AuleWidget from "./widget";
 
 class AuleBubblePlugin implements PluginValue {
-  dom: HTMLElement;
   decorations: DecorationSet;
 
   constructor(view: EditorView) {
@@ -19,7 +18,7 @@ class AuleBubblePlugin implements PluginValue {
   }
 
   update(update: ViewUpdate) {
-    if (update.docChanged || update.viewportChanged) {
+    if (update.docChanged) {
       this.decorations = this.buildDecorations(update.view);
     }
   }

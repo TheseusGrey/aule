@@ -6,7 +6,9 @@ export default class AuleWidget extends WidgetType {
 		const speechBubble = document.createElement('div');
     speechBubble.classList.add('aule-bubble');
     setIcon(speechBubble, 'messages-square');
-
+    
+    speechBubble.role = 'button';
+    speechBubble.tabIndex = -1;
     return speechBubble;
 	}
 }
