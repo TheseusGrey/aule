@@ -36,6 +36,17 @@ export class AssistantView extends ItemView {
 		this.draw();
 	}
 
+	private formateConversationName = () => {
+		// We can pull ways to configure this from the settings
+		const timestamp = new Intl.DateTimeFormat(navigator.language, {
+			timeStyle: 'medium',
+			dateStyle: 'medium'
+		}).format(Date.now())
+
+		return `New Conversation [${timestamp}]`
+	}
+
+
 	private readonly draw = (): void => {
 		const container = this.containerEl.children[1];
 		const rootEl = document.createElement('div');
@@ -43,7 +54,7 @@ export class AssistantView extends ItemView {
 
 		rootEl.createDiv().
 			createSpan({ cls: 'title' }).
-			setText("Aule");
+			setText(this.formateConversationName())
 
 		MarkdownRenderer.render(this.app, `\`\`\`dialogue
 left: Aulë
