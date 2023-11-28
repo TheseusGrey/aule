@@ -1,51 +1,59 @@
 
 import { AuleSettings } from './settings';
 import {
-  ItemView,
-  WorkspaceLeaf,
+	FileView,
+	ItemView,
+	MarkdownRenderer,
+	MarkdownView,
+	TextFileView,
+	WorkspaceLeaf,
 } from 'obsidian';
 
 export const AssistantViewType = 'aule-assistant-toolbar';
 
 export class AssistantView extends ItemView {
-  private readonly settings: AuleSettings;
+	private readonly settings: AuleSettings;
 
-  constructor(leaf: WorkspaceLeaf, settings: AuleSettings) {
-    super(leaf);
-    this.settings = settings;
-  }
+	constructor(leaf: WorkspaceLeaf, settings: AuleSettings) {
+		super(leaf);
+		this.settings = settings;
+	}
 
-  public getViewType(): string {
-    return AssistantViewType;
-  }
+	public getViewType(): string {
+		return AssistantViewType;
+	}
 
-  public getDisplayText(): string {
-    return 'Aule';
-  }
+	public getDisplayText(): string {
+		return 'Aule';
+	}
 
-  public getIcon(): string {
-    return 'messages-square';
-  }
+	public getIcon(): string {
+		return 'messages-square';
+	}
 
-  public load(): void {
-    super.load();
-    this.draw();
-  }
+	public load(): void {
+		super.load();
+		this.draw();
+	}
 
-  private readonly draw = (): void => {
-    const container = this.containerEl.children[1];
+	private readonly draw = (): void => {
+		const container = this.containerEl.children[1];
+		const rootEl = document.createElement('div');
+		rootEl.addClass("aule-conversation");
 
-    const rootEl = document.createElement('div');
-    rootEl.addClass("aule-conversation");
+		rootEl.createDiv().
+			createSpan({ cls: 'title' }).
+			setText("Aule");
 
-    rootEl.createDiv().
-      createSpan({ cls: 'title' }).
-      setText("Aule");
+		MarkdownRenderer.render(this.app, `\`\`\`dialogue
+left: Aulë
+right: Me
 
-
-    container.empty();
-    container.appendChild(rootEl);
-  }
+< Just a sample for the dialogue plugin we can build off
+> We can use this to build the chat's between us and Aulë
+\`\`\``, rootEl.createDiv(), 'Test', this)
+		container.appendChild(rootEl);
+	}
 }
 
 // /**
