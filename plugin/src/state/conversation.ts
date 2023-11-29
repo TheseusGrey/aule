@@ -1,5 +1,5 @@
 import { StateField, EditorState, Transaction, StateEffect } from '@codemirror/state'
-import { assistantName } from "../settings"
+import { assistantName } from "src/settings"
 
 
 const re = new RegExp(`${assistantName}`)
