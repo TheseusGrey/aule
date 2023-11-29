@@ -19,3 +19,19 @@
   background-color: rgb(var(--ctp-pink));
   color: var(--text-on-accent);
 }
+
+.dialogue-plugin-message {
+	border-radius: var(--clickable-icon-radius);
+	background-color: var(--background-secondary-alt);
+}
+
+/* messages from first dialogue participant */
+.dialogue-plugin-message[data-participant-id="1"] {
+}
+
+/* messages from second dialogue participant */
+.dialogue-plugin-message[data-participant-id="2"] {
+}
+
+.dialogue-plugin-message-content {
+}

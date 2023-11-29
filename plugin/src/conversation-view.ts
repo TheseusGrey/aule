@@ -1,11 +1,8 @@
 
 import { AuleSettings } from './settings';
 import {
-	FileView,
 	ItemView,
 	MarkdownRenderer,
-	MarkdownView,
-	TextFileView,
 	WorkspaceLeaf,
 } from 'obsidian';
 
@@ -13,6 +10,7 @@ export const AssistantViewType = 'aule-assistant-toolbar';
 
 export class AssistantView extends ItemView {
 	private readonly settings: AuleSettings;
+	private conversation: string;
 
 	constructor(leaf: WorkspaceLeaf, settings: AuleSettings) {
 		super(leaf);
@@ -50,11 +48,10 @@ export class AssistantView extends ItemView {
 	private readonly draw = (): void => {
 		const container = this.containerEl.children[1];
 		const rootEl = document.createElement('div');
-		rootEl.addClass("aule-conversation");
-
-		rootEl.createDiv().
-			createSpan({ cls: 'title' }).
+		rootEl.createEl('h1', { cls: 'title' }).
 			setText(this.formateConversationName())
+		rootEl.addClass("aule-conversation");
+		const conversationEl = rootEl.createDiv();
 
 		MarkdownRenderer.render(this.app, `\`\`\`dialogue
 left: Aulë
@@ -62,7 +59,7 @@ right: Me
 
 < Just a sample for the dialogue plugin we can build off
 > We can use this to build the chat's between us and Aulë
-\`\`\``, rootEl.createDiv(), 'Test', this)
+\`\`\``, conversationEl, 'Test', this)
 		container.appendChild(rootEl);
 	}
 }
