@@ -10,7 +10,6 @@ export const AssistantViewType = 'aule-assistant-toolbar';
 
 export class AssistantView extends ItemView {
 	private readonly settings: AuleSettings;
-	private conversation: string;
 
 	constructor(leaf: WorkspaceLeaf, settings: AuleSettings) {
 		super(leaf);

@@ -13,23 +13,23 @@ export default class Aule extends Plugin {
 	public settings: AuleSettings;
 	public modelHost: WebSocket;
 	private assistantView: AssistantView
-	
+
 	async onload() {
 		await this.loadSettings();
 		// this.registerEditorExtension([auleBubblePlugin])
 
 		this.registerView(
-      AssistantViewType,
-      (leaf) =>
-        (this.assistantView = new AssistantView(leaf, this.settings)),
-    );
+			AssistantViewType,
+			(leaf) =>
+				(this.assistantView = new AssistantView(leaf, this.settings)),
+		);
 
 		this.modelHost = new WebSocket(this.settings.modelHostUrl);
 		this.modelHost.onmessage = event => {
 			// this should be sent to the dialog window instead
 			console.log(event.data)
 		}
-	
+
 		this.addRibbonIcon(
 			"messages-square",
 			assistantName,
@@ -37,7 +37,7 @@ export default class Aule extends Plugin {
 				this.toggleAssistantView();
 			}
 		);
-		
+
 
 		commands(this).forEach(command => this.addCommand(command))
 
@@ -50,11 +50,11 @@ export default class Aule extends Plugin {
 		// 	console.log("click", evt);
 		// });
 
-		
+
 		console.log("Aule: Connection to Language Model established.")
 	}
 
-	onunload() {}
+	onunload() { }
 
 	async loadSettings() {
 		this.settings = Object.assign(
@@ -69,21 +69,21 @@ export default class Aule extends Plugin {
 	}
 
 	readonly toggleAssistantView = async (): Promise<void> => {
-    const existing = this.app.workspace.getLeavesOfType(AssistantViewType);
-    if (existing.length) {
-      this.app.workspace.revealLeaf(existing[0]);
-      return;
-    }
+		const existing = this.app.workspace.getLeavesOfType(AssistantViewType);
+		if (existing.length) {
+			this.app.workspace.revealLeaf(existing[0]);
+			return;
+		}
 
-    await this.app.workspace.getRightLeaf(false).setViewState({
-      type: AssistantViewType,
-      active: true,
-    });
+		await this.app.workspace.getRightLeaf(false).setViewState({
+			type: AssistantViewType,
+			active: true,
+		});
 
-    this.app.workspace.revealLeaf(
-      this.app.workspace.getLeavesOfType(AssistantViewType)[0],
-    );
-  };
+		this.app.workspace.revealLeaf(
+			this.app.workspace.getLeavesOfType(AssistantViewType)[0],
+		);
+	};
 }
 
 class SampleSettingTab extends PluginSettingTab {
