@@ -3,8 +3,10 @@ import { AuleSettings } from './settings';
 import {
 	ItemView,
 	MarkdownRenderer,
+	ViewStateResult,
 	WorkspaceLeaf,
 } from 'obsidian';
+import { Conversation } from './utils/conversation';
 
 export const AssistantViewType = 'aule-assistant-toolbar';
 
@@ -28,6 +30,13 @@ export class AssistantView extends ItemView {
 		return 'messages-square';
 	}
 
+	async setState(state: any, result: ViewStateResult): Promise<void> {
+
+	}
+
+	getState() {
+
+	}
 	public load(): void {
 		super.load();
 		this.draw();

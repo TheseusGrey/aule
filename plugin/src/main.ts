@@ -7,25 +7,27 @@ import {
 import { AuleSettings, DEFAULT_SETTINGS, assistantName } from "./settings";
 import { AssistantView, AssistantViewType } from "./conversation-view";
 import commands from "./commands";
+import { conversationField } from "./state/conversation";
+import { getAssistantView } from "./utils/helpers";
 
 
 export default class Aule extends Plugin {
 	public settings: AuleSettings;
 	public modelHost: WebSocket;
-	private assistantView: AssistantView
+
 
 	async onload() {
 		await this.loadSettings();
-		// this.registerEditorExtension([auleBubblePlugin])
+		this.registerEditorExtension([conversationField])
 
 		this.registerView(
 			AssistantViewType,
-			(leaf) =>
-				(this.assistantView = new AssistantView(leaf, this.settings)),
+			(leaf) => new AssistantView(leaf, this.settings),
 		);
 
 		this.modelHost = new WebSocket(this.settings.modelHostUrl);
 		this.modelHost.onmessage = event => {
+			const view = getAssistantView(this);
 			// this should be sent to the dialog window instead
 			console.log(event.data)
 		}
@@ -33,7 +35,7 @@ export default class Aule extends Plugin {
 		this.addRibbonIcon(
 			"messages-square",
 			assistantName,
-			(evt: MouseEvent) => {
+			() => {
 				this.toggleAssistantView();
 			}
 		);
