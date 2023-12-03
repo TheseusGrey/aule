@@ -7,15 +7,21 @@ import {
 	WorkspaceLeaf,
 } from 'obsidian';
 import { Conversation } from './utils/conversation';
+import { ConversationState, HistoryItem } from './ConversationState';
 
 export const AssistantViewType = 'aule-assistant-toolbar';
 
-export class AssistantView extends ItemView {
+export class AssistantView extends ItemView implements ConversationState {
 	private readonly settings: AuleSettings;
+	name: string
+	history: HistoryItem[]
+
 
 	constructor(leaf: WorkspaceLeaf, settings: AuleSettings) {
 		super(leaf);
 		this.settings = settings;
+		this.name = this.formateConversationName();
+		this.history = this.initaliseConversation();
 	}
 
 	public getViewType(): string {
@@ -30,13 +36,20 @@ export class AssistantView extends ItemView {
 		return 'messages-square';
 	}
 
-	async setState(state: any, result: ViewStateResult): Promise<void> {
+	async setState(state: ConversationState, result: ViewStateResult): Promise<void> {
+		if (state.name) this.name = state.name;
+		if (state.history) this.history = state.history;
 
+		return super.setState(state, result);
 	}
 
-	getState() {
-
+	getState(): ConversationState {
+		return {
+			name: this.name,
+			history: this.history,
+		};
 	}
+
 	public load(): void {
 		super.load();
 		this.draw();
@@ -49,25 +62,31 @@ export class AssistantView extends ItemView {
 			dateStyle: 'medium'
 		}).format(Date.now())
 
-		return `New Conversation [${timestamp}]`
+		return `Conversation [${timestamp}]`
 	}
 
-
+	private initaliseConversation = () => {
+		return [
+			{ prefix: '', dialogue: '```dialogue' },
+			{ prefix: 'left:', dialogue: 'Aulë' },
+			{ prefix: 'right:', dialogue: 'Me' },
+			{ prefix: '', dialogue: '' },
+		] as HistoryItem[]
+	}
 	private readonly draw = (): void => {
 		const container = this.containerEl.children[1];
 		const rootEl = document.createElement('div');
 		rootEl.createEl('h1', { cls: 'title' }).
-			setText(this.formateConversationName())
+			setText(this.name)
 		rootEl.addClass("aule-conversation");
 		const conversationEl = rootEl.createDiv();
 
-		MarkdownRenderer.render(this.app, `\`\`\`dialogue
-left: Aulë
-right: Me
-
-< Just a sample for the dialogue plugin we can build off
-> We can use this to build the chat's between us and Aulë
-\`\`\``, conversationEl, 'Test', this)
+		MarkdownRenderer.render(
+			this.app,
+			this.history.map(item => `${item.prefix} ${item.dialogue}`).join('\n'),
+			conversationEl,
+			'Test',
+			this)
 		container.appendChild(rootEl);
 	}
 }

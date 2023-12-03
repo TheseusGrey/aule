@@ -5,7 +5,7 @@ import {
 	Setting,
 } from "obsidian";
 import { AuleSettings, DEFAULT_SETTINGS, assistantName } from "./settings";
-import { AssistantView, AssistantViewType } from "./conversation-view";
+import { AssistantView, AssistantViewType } from "./view/ConversationView";
 import commands from "./commands";
 import { conversationField } from "./state/conversation";
 import { getAssistantView } from "./utils/helpers";

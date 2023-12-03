@@ -1,4 +1,4 @@
-import { AssistantView, AssistantViewType } from "src/conversation-view";
+import { AssistantView, AssistantViewType } from "../view/ConversationView";
 import Aule from "src/main";
 
 
