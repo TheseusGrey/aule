@@ -1,12 +1,12 @@
 
-import { AuleSettings } from './settings';
+import { AuleSettings } from '../settings';
 import {
 	ItemView,
 	MarkdownRenderer,
+	setIcon,
 	ViewStateResult,
 	WorkspaceLeaf,
 } from 'obsidian';
-import { Conversation } from './utils/conversation';
 import { ConversationState, HistoryItem } from './ConversationState';
 
 export const AssistantViewType = 'aule-assistant-toolbar';
@@ -56,13 +56,16 @@ export class AssistantView extends ItemView implements ConversationState {
 	}
 
 	private formateConversationName = () => {
-		// We can pull ways to configure this from the settings
-		const timestamp = new Intl.DateTimeFormat(navigator.language, {
-			timeStyle: 'medium',
-			dateStyle: 'medium'
-		}).format(Date.now())
+		const conversationName = this.settings.conversationName;
+		if (this.settings.includeTimestamp) {
+			const timestamp = new Intl.DateTimeFormat(navigator.language, {
+				timeStyle: 'medium',
+				dateStyle: 'medium'
+			}).format(Date.now())
+			conversationName + ` [${timestamp}]`
+		}
 
-		return `Conversation [${timestamp}]`
+		return conversationName;
 	}
 
 	private initaliseConversation = () => {
@@ -73,6 +76,7 @@ export class AssistantView extends ItemView implements ConversationState {
 			{ prefix: '', dialogue: '' },
 		] as HistoryItem[]
 	}
+
 	private readonly draw = (): void => {
 		const container = this.containerEl.children[1];
 		const rootEl = document.createElement('div');
@@ -80,23 +84,38 @@ export class AssistantView extends ItemView implements ConversationState {
 			setText(this.name)
 		rootEl.addClass("aule-conversation");
 		const conversationEl = rootEl.createDiv();
+		const inputContainer = rootEl.createDiv({ cls: 'aule-input-container' });
 
+		const inputEl = inputContainer.createEl("textarea", { cls: 'aule-input-area' });
+		const inputButtonEl = inputContainer.createEl("button", { cls: 'aule-input-button' });
+		setIcon(inputButtonEl, this.getIcon());
 		MarkdownRenderer.render(
 			this.app,
-			this.history.map(item => `${item.prefix} ${item.dialogue}`).join('\n'),
+			this.history.map(item => `${item.prefix} ${item.dialogue}`).join('\n').concat('\n```'),
 			conversationEl,
 			'Test',
 			this)
+
 		container.appendChild(rootEl);
 	}
+
+	setConversationName(name: string) {
+		this.name = name;
+		this.app.workspace.requestSaveLayout();
+	}
+
+	appendToHistory(newItem: HistoryItem) {
+		this.history.push(newItem);
+		this.app.workspace.requestSaveLayout();
+	}
+
+	appendUserDialogue(dialogue: string) {
+		this.appendToHistory({ prefix: '>', dialogue: dialogue });
+	}
+
+	appendAssistantDialogue(dialogue: string) {
+		this.appendToHistory({ prefix: '<', dialogue: dialogue });
+	}
+
 }
 
-// /**
-//  * Convert an svg string into an HTML element.
-//  *
-//  * @param svgText svg image as a string
-//  */
-// const Element = (svgText: string): HTMLElement => {
-//   const parser = new DOMParser();
-//   return parser.parseFromString(svgText, 'text/xml').documentElement;
-// };

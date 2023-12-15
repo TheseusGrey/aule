@@ -14,10 +14,40 @@
   height: var(--img-size);
 }
 
-.aule-bubble:has(> svg):hover {
+
+.aule-input-container {
+	position: fixed;
+	left: 0;
+	bottom: 0;
+	width: 100%;
+
+	display: grid;
+	grid-template-columns: 1fr var(--size-4-18);
+	grid-template-rows: 4rem;
+	gap: var(--size-4-2);
+	
+	padding: var(--size-4-2);
+	padding-bottom: var(--size-4-12);
+}
+
+.aule-input-area {
+	font-size: 16px;
+	font-weight: 600;
+}
+.aule-input-button {
+	height: 100%;
+	--icon-size: 3rem;
+}
+
+.aule-input-button:hover {
   cursor: pointer;
   background-color: rgb(var(--ctp-pink));
   color: var(--text-on-accent);
+}
+
+.aule-input-button:active {
+	background-color: initial;
+	color: initial;
 }
 
 .dialogue-plugin-message {
@@ -35,3 +65,4 @@
 
 .dialogue-plugin-message-content {
 }
+
