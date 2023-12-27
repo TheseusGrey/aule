@@ -129,15 +129,8 @@ export class AssistantView extends ItemView implements ConversationState {
 		})
 	}
 
-	private clearPreviousConversationRender() {
-		const previousRenders = this.rootEl.getElementsByClassName("block-language-dialogue");
-		while (previousRenders.length > 0) {
-			previousRenders[0].parentNode?.removeChild(previousRenders[0]);
-		}
-	}
-
 	private renderConversationHistory() {
-		this.clearPreviousConversationRender();
+		this.conversationEl.empty();
 
 		const convoHistory = this.history
 			.map(item => `${item.prefix} ${item.dialogue}`)

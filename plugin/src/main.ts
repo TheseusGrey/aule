@@ -104,6 +104,7 @@ class SampleSettingTab extends PluginSettingTab {
 					.setValue(this.plugin.settings.modelHostUrl)
 					.onChange(async (value) => {
 						this.plugin.settings.modelHostUrl = value;
+						this.plugin.modelHost.close();
 						this.plugin.modelHost = new WebSocket(value);
 						await this.plugin.saveSettings();
 					})
