@@ -11,6 +11,14 @@ import { ConversationState, HistoryItem } from './ConversationState';
 
 export const AssistantViewType = 'aule-assistant-toolbar';
 
+const initialConversation = [
+	{ prefix: '', dialogue: '```dialogue' },
+	{ prefix: 'left:', dialogue: 'Aulë' },
+	{ prefix: 'right:', dialogue: 'Me' },
+	{ prefix: '', dialogue: '' },
+	{ prefix: '#', dialogue: 'Send a message to get this conversation rolling!' }
+]
+
 export class AssistantView extends ItemView implements ConversationState {
 	private readonly settings: AuleSettings;
 	name: string
@@ -25,8 +33,8 @@ export class AssistantView extends ItemView implements ConversationState {
 		super(leaf);
 		this.settings = settings;
 		this.name = this.formateConversationName();
-		this.history = this.initaliseConversation();
-		console.log(this.formateConversationName());
+		this.history = initialConversation;
+		this.rootEl.addClass("aule-conversation");
 		this.title.setText(this.name);
 	}
 
@@ -70,22 +78,11 @@ export class AssistantView extends ItemView implements ConversationState {
 			}).format(Date.now())
 			conversationName += ` [${timestamp}]`
 		}
+
 		return conversationName;
 	}
 
-	private initaliseConversation = () => {
-		return [
-			{ prefix: '', dialogue: '```dialogue' },
-			{ prefix: 'left:', dialogue: 'Aulë' },
-			{ prefix: 'right:', dialogue: 'Me' },
-			{ prefix: '', dialogue: '' },
-			{ prefix: '#', dialogue: 'Send a message to get this conversation rolling!' }
-		] as HistoryItem[]
-	}
-
 	private readonly draw = (): void => {
-		this.rootEl.addClass("aule-conversation");
-
 		this.renderUserInput();
 		this.renderConversationHistory();
 		this.container.appendChild(this.rootEl);
@@ -93,12 +90,14 @@ export class AssistantView extends ItemView implements ConversationState {
 
 	setConversationName(name: string) {
 		this.name = name;
+		this.title.setText(this.name);
 		this.app.workspace.requestSaveLayout();
 	}
 
 	appendToHistory(newItem: HistoryItem) {
 		this.history.push(newItem);
 		this.app.workspace.requestSaveLayout();
+		this.renderConversationHistory();
 	}
 
 	appendUserDialogue(dialogue: string) {
@@ -115,17 +114,21 @@ export class AssistantView extends ItemView implements ConversationState {
 		setIcon(inputButtonEl, this.getIcon());
 
 		inputButtonEl.onClickEvent(() => {
-			this.history.push({ prefix: '>', dialogue: inputEl.value });
-			this.renderConversationHistory();
+			this.appendUserDialogue(inputEl.value);
 			this.app.workspace.requestSaveLayout();
 			inputEl.value = "";
 		})
 	}
-	private renderConversationHistory() {
-		const previousRenders = document.getElementsByClassName("block-language-dialogue");
+
+	private clearPreviousConversationRender() {
+		const previousRenders = this.rootEl.getElementsByClassName("block-language-dialogue");
 		while (previousRenders.length > 0) {
 			previousRenders[0].parentNode?.removeChild(previousRenders[0]);
 		}
+	}
+
+	private renderConversationHistory() {
+		this.clearPreviousConversationRender();
 
 		const convoHistory = this.history
 			.map(item => `${item.prefix} ${item.dialogue}`)
@@ -140,6 +143,7 @@ export class AssistantView extends ItemView implements ConversationState {
 			this
 		);
 
+		// This makes the scroll hit the bottom on every re-render
 		this.conversationEl.scrollTop = this.conversationEl.scrollHeight - this.conversationEl.clientHeight;
 	}
 }
