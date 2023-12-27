@@ -7,8 +7,6 @@ import {
 import { AuleSettings, DEFAULT_SETTINGS, assistantName } from "./settings";
 import { AssistantView, AssistantViewType } from "./view/ConversationView";
 import commands from "./commands";
-import { conversationField } from "./state/conversation";
-import { getAssistantView } from "./utils/helpers";
 
 
 export default class Aule extends Plugin {
@@ -18,20 +16,13 @@ export default class Aule extends Plugin {
 
 	async onload() {
 		await this.loadSettings();
-		this.registerEditorExtension([conversationField])
+		this.modelHost = new WebSocket(this.settings.modelHostUrl);
 
 		this.registerView(
 			AssistantViewType,
 			(leaf) => new AssistantView(leaf, this.settings, this.modelHost),
 		);
 
-		this.modelHost = new WebSocket(this.settings.modelHostUrl);
-		this.modelHost.onmessage = event => {
-			const view = getAssistantView(this);
-			console.log(view);
-			console.log(event.data);
-			view?.appendAssistantDialogue(event.data);
-		}
 
 		this.addRibbonIcon(
 			"messages-square",
@@ -57,7 +48,9 @@ export default class Aule extends Plugin {
 		console.log("Aule: Connection to Language Model established.")
 	}
 
-	onunload() { }
+	onunload() {
+		this.modelHost.close();
+	}
 
 	async loadSettings() {
 		this.settings = Object.assign(

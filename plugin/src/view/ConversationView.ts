@@ -38,6 +38,12 @@ export class AssistantView extends ItemView implements ConversationState {
 		this.history = initialConversation;
 		this.rootEl.addClass("aule-conversation");
 		this.title.setText(this.name);
+
+		this.connection.onmessage = event => {
+			this.appendAssistantDialogue(event.data);
+		}
+
+
 	}
 
 	public getViewType(): string {
