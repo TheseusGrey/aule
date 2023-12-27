@@ -14,19 +14,23 @@
   height: var(--img-size);
 }
 
+.aule-conversation {
+	display: grid;
+	grid-template-rows: min-content 1fr 4rem;
+	height: 100%;
+}
+
+.aule-conversation-wrapper {
+	overflow: scroll;
+}
 
 .aule-input-container {
-	position: fixed;
-	left: 0;
-	bottom: 0;
-	width: 100%;
-
 	display: grid;
 	grid-template-columns: 1fr var(--size-4-18);
 	grid-template-rows: 4rem;
 	gap: var(--size-4-2);
 	
-	padding: var(--size-4-2);
+	padding-inline: var(--size-4-4);
 	padding-bottom: var(--size-4-12);
 }
 
