@@ -21,6 +21,7 @@ const initialConversation = [
 
 export class AssistantView extends ItemView implements ConversationState {
 	private readonly settings: AuleSettings;
+	private readonly connection: WebSocket;
 	name: string
 	history: HistoryItem[]
 	container = this.containerEl.children[1];
@@ -29,9 +30,10 @@ export class AssistantView extends ItemView implements ConversationState {
 	conversationEl = this.rootEl.createDiv({ cls: 'aule-conversation-wrapper' });
 	inputContainer = this.rootEl.createDiv({ cls: 'aule-input-container' });
 
-	constructor(leaf: WorkspaceLeaf, settings: AuleSettings) {
+	constructor(leaf: WorkspaceLeaf, settings: AuleSettings, connection: WebSocket) {
 		super(leaf);
 		this.settings = settings;
+		this.connection = connection
 		this.name = this.formateConversationName();
 		this.history = initialConversation;
 		this.rootEl.addClass("aule-conversation");
@@ -116,6 +118,7 @@ export class AssistantView extends ItemView implements ConversationState {
 		inputButtonEl.onClickEvent(() => {
 			this.appendUserDialogue(inputEl.value);
 			this.app.workspace.requestSaveLayout();
+			this.connection.send(`lsn::${inputEl.value}`);
 			inputEl.value = "";
 		})
 	}

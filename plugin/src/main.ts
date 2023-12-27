@@ -22,12 +22,14 @@ export default class Aule extends Plugin {
 
 		this.registerView(
 			AssistantViewType,
-			(leaf) => new AssistantView(leaf, this.settings),
+			(leaf) => new AssistantView(leaf, this.settings, this.modelHost),
 		);
 
 		this.modelHost = new WebSocket(this.settings.modelHostUrl);
 		this.modelHost.onmessage = event => {
 			const view = getAssistantView(this);
+			console.log(view);
+			console.log(event.data);
 			view?.appendAssistantDialogue(event.data);
 		}
 

@@ -15,7 +15,7 @@ device = "cuda"
 
 # Model Initialisation
 tokenizer = AutoTokenizer.from_pretrained("PygmalionAI/pygmalion-6b")
-model = AutoModelForCausalLM.from_pretrained("PygmalionAI/pygmalion-6b", torch_dtype=torch.float16)
+model = AutoModelForCausalLM.from_pretrained("PygmalionAI/pygmalion-6b", torch_dtype=torch.float16, max_length=120)
 model.to(device)
 
 # Websocket Connections
