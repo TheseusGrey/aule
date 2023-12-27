@@ -28,8 +28,7 @@ export default class Aule extends Plugin {
 		this.modelHost = new WebSocket(this.settings.modelHostUrl);
 		this.modelHost.onmessage = event => {
 			const view = getAssistantView(this);
-			// this should be sent to the dialog window instead
-			console.log(event.data)
+			view?.appendAssistantDialogue(event.data);
 		}
 
 		this.addRibbonIcon(
