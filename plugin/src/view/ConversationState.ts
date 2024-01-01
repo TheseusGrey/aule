@@ -8,4 +8,5 @@ export type HistoryItem = {
 export interface ConversationState {
 	name: string
 	history: HistoryItem[]
+	lastMessage: number
 }

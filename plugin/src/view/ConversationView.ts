@@ -8,6 +8,7 @@ import {
 	WorkspaceLeaf,
 } from 'obsidian';
 import { ConversationState, HistoryItem } from './ConversationState';
+import { formatMessage } from 'src/utils/helpers';
 
 export const AssistantViewType = 'aule-assistant-toolbar';
 
@@ -24,6 +25,7 @@ export class AssistantView extends ItemView implements ConversationState {
 	private readonly connection: WebSocket;
 	name: string
 	history: HistoryItem[]
+	lastMessage: number
 	container = this.containerEl.children[1];
 	rootEl = document.createElement('div');
 	title = this.rootEl.createEl('h1', { cls: 'title' });
@@ -36,6 +38,7 @@ export class AssistantView extends ItemView implements ConversationState {
 		this.connection = connection
 		this.name = this.formateConversationName();
 		this.history = initialConversation;
+		this.lastMessage = Date.now();
 		this.rootEl.addClass("aule-conversation");
 		this.title.setText(this.name);
 
@@ -69,11 +72,17 @@ export class AssistantView extends ItemView implements ConversationState {
 		return {
 			name: this.name,
 			history: this.history,
+			lastMessage: this.lastMessage
 		};
 	}
 
 	public load(): void {
 		super.load();
+		if (((Date.now() - this.lastMessage) / 36e5) > 36e5) {
+			this.history = initialConversation
+			this.app.workspace.requestSaveLayout();
+		}
+
 		this.draw();
 	}
 
@@ -123,8 +132,9 @@ export class AssistantView extends ItemView implements ConversationState {
 
 		inputButtonEl.onClickEvent(() => {
 			this.appendUserDialogue(inputEl.value);
+			this.lastMessage = Date.now();
 			this.app.workspace.requestSaveLayout();
-			this.connection.send(`lsn::${inputEl.value}`);
+			this.connection.send(`lsn::${formatMessage(inputEl.value, true)}`);
 			inputEl.value = "";
 		})
 	}

@@ -1,9 +1,3 @@
-import { AssistantView, AssistantViewType } from "../view/ConversationView";
-import Aule from "src/main";
+export const formatContext = (context: string) => `<|system|>${context}`
+export const formatMessage = (message: string, expectResponse?: boolean) => `<|user|>${message}${expectResponse && "<|model|>"}`
 
-
-export const getAssistantView: (plugin: Aule) => AssistantView | undefined = (plugin: Aule) => {
-	return plugin.app.workspace.getLeavesOfType(AssistantViewType).reduce((acc, currentVal) => {
-		if (currentVal instanceof AssistantView) return currentVal
-	}, undefined);
-}
