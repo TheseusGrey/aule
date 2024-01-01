@@ -10,7 +10,7 @@ class Context:
 	conversation: Conversation
 
 
-async def handleIncomingMessage(messageType: str, content: str, context: Context, deviceType: str, model: Any, tokenizer: Any):
+async def processMessage(messageType: str, content: str, context: Context, deviceType: str, model: Any, tokenizer: Any):
     match messageType:
         case 'lsn':
 			# Leaving convo context out for now as the new model might do something different

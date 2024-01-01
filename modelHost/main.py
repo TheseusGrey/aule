@@ -5,7 +5,7 @@ from typing import Dict
 from uuid import UUID
 
 import torch
-from utils.helpers import Context, handleIncomingMessage
+from utils.helpers import Context, processMessage
 import websockets
 from transformers import AutoModelForCausalLM, AutoTokenizer
 from utils.conversationHelpers import Conversation, initialiseConversation
@@ -34,7 +34,7 @@ async def handler(websocket: websockets.WebSocketServerProtocol):
 
             assert isinstance(message, str)
             [eventType, messageContent] = message.split("::", 1)
-            await handleIncomingMessage(
+            await processMessage(
 				eventType,
 				messageContent,
 				connections[websocket.id],
