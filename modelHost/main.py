@@ -5,59 +5,54 @@ from typing import Dict
 from uuid import UUID
 
 import torch
+from utils.helpers import Context, handleIncomingMessage
 import websockets
 from transformers import AutoModelForCausalLM, AutoTokenizer
-from handlers.listenHandler import listen
-from utils.conversationHelpers import Conversation, formatPrompt, initialiseConversation, provideContextToModel
+from utils.conversationHelpers import Conversation, initialiseConversation
 
 # App config
 device = "cuda"
 
 # Model Initialisation
-tokenizer = AutoTokenizer.from_pretrained("PygmalionAI/pygmalion-6b")
-model = AutoModelForCausalLM.from_pretrained("PygmalionAI/pygmalion-6b", torch_dtype=torch.float16, max_length=120)
+tokenizer = AutoTokenizer.from_pretrained("PygmalionAI/pygmalion-2-7b")
+model = AutoModelForCausalLM.from_pretrained("PygmalionAI/pygmalion-2-7b", torch_dtype=torch.float16, min_length=100, max_length=120)
 model.to(device)
 
 # Websocket Connections
-connections: Dict[UUID, Conversation] = {}
+connections: Dict[UUID, Context]  = {}
 
 # Message Handler
 async def handler(websocket: websockets.WebSocketServerProtocol):
     if websocket.id not in connections:
-        connections[websocket.id] = Conversation(initialiseConversation())
+        newConversation = Conversation(initialiseConversation())
+        connections[websocket.id] = Context(websocket, newConversation)
+
     while True:
         try:
             message = await websocket.recv()
             print('Incoming message: "{}".'.format(message))
-            assert isinstance(message, str)
-            [eventType, data] = message.split("::", 1)
 
-            match eventType:
-                case "ctx":
-                    connections[websocket.id].previousContext = connections[websocket.id].context
-                    connections[websocket.id].context = data
-                    connections[websocket.id].contextUpdated = True
-                case "lsn":
-                    prompt = data
-                    if connections[websocket.id].contextUpdated:
-                        connections[websocket.id].contextUpdated = False
-                        prompt = provideContextToModel(str(connections[websocket.id].context)) + prompt
-                    
-                    response = listen(formatPrompt(connections[websocket.id].history, "You: " + prompt), tokenizer, model, device)
-                    await websocket.send("lsn::{}".format(response)) 
-                case _:
-                    print("Unknown command, skipping...")
+            assert isinstance(message, str)
+            [eventType, messageContent] = message.split("::", 1)
+            await handleIncomingMessage(
+				eventType,
+				messageContent,
+				connections[websocket.id],
+				device,
+				model,
+				tokenizer
+			)
+
         except websockets.ConnectionClosedOK:
             connections.pop(websocket.id)
-        except AssertionError as error:
+        except AssertionError:
             print("Unable to parse incoming message.")
-
 
 async def main():
     async with websockets.serve(handler, "localhost", 8765):
         await asyncio.Future()  # run forever
 
-
 if __name__ == "__main__":
     print("Starting websocket server...")
     asyncio.run(main())
+
