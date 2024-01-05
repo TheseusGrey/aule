@@ -11,6 +11,7 @@ class Context:
 
 
 async def processMessage(messageType: str, content: str, context: Context, deviceType: str, model: Any, tokenizer: Any):
+    print('Incoming {} message from {}'.format(messageType, context.connection.id))
     match messageType:
         case 'lsn':
 			# Leaving convo context out for now as the new model might do something different

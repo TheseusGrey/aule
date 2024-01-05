@@ -5,15 +5,15 @@ from uuid import UUID
 import torch
 from utils.helpers import Context, processMessage
 import websockets
-from transformers import AutoModelForCausalLM, AutoTokenizer
+from transformers import AutoModelForCausalLM, AutoTokenizer, LlamaForCausalLM, LlamaTokenizer
 from utils.conversationHelpers import Conversation, initialiseConversation
 
 # App config
 device = "cuda"
 
 # Model Initialisation
-tokenizer = AutoTokenizer.from_pretrained("PygmalionAI/pygmalion-2-7b")
-model = AutoModelForCausalLM.from_pretrained("PygmalionAI/pygmalion-2-7b", torch_dtype=torch.float16, min_length=100, max_length=120)
+tokenizer = LlamaTokenizer.from_pretrained("PygmalionAI/pygmalion-2-7b")
+model = LlamaForCausalLM.from_pretrained("PygmalionAI/pygmalion-2-7b", torch_dtype=torch.float16, min_length=100, max_length=120)
 model.to(device)
 
 # Websocket Connections
