@@ -44,6 +44,7 @@ export class AssistantView extends ItemView implements ConversationState {
 
 		this.connection.onmessage = event => {
 			const { command, content } = parseMessage(event.data)
+			console.log(`Got a ${command} message from Aule saying: ${content}`)
 			switch (command) {
 				case 'lsn':
 					this.appendAssistantDialogue(content);
@@ -64,21 +65,6 @@ export class AssistantView extends ItemView implements ConversationState {
 
 	public getIcon(): string {
 		return 'messages-square';
-	}
-
-	async setState(state: ConversationState, result: ViewStateResult): Promise<void> {
-		if (state.name) this.name = state.name;
-		if (state.history) this.history = state.history;
-
-		return super.setState(state, result);
-	}
-
-	getState(): ConversationState {
-		return {
-			name: this.name,
-			history: this.history,
-			lastMessage: this.lastMessage
-		};
 	}
 
 	public load(): void {

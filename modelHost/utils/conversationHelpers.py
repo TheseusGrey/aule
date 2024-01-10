@@ -1,14 +1,3 @@
-
-from dataclasses import dataclass
-
-@dataclass
-class Conversation:
-  history: str
-  context: str = ""
-  previousContext: str = ""
-  contextUpdated: bool = False
-
-
 personaName = "Aulë"
 personaFacts = [
   "An assistant helping someone work on a project.",
@@ -19,10 +8,12 @@ personaFacts = [
 ]
 
 def initialiseConversation():
-  return f"{personaName}'s Persona: {' '.join(personaFacts)}\n<START>\n"
+	return {"role": "system", "content": f"Take on the role of {personaName}'s.  {' '.join(personaFacts)}\n<START>\n"}
 
 def provideContextToModel(context: str):
-  return f"Oh, by the way, the context around what we're working on has changed slightly, here's the most up-to-date information.{context}\n"
+	return {"role": "system", "content": context}
 
-def formatPrompt(dialogueHistory: str, prompt: str): # Might need to remove the additional prompt in the cases when the context has changed if the modal doesn't like it
-  return f"{dialogueHistory}\nYou: {prompt}\n{personaName}:"
+def getChatTemplate(): 
+	return """{% for message in messages %}
+    {{'<|' + message['role'] + '|>' + message['content']}}
+{% endfor %}"""

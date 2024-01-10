@@ -1,8 +1,10 @@
 from websockets import WebSocketServerProtocol
 from dataclasses import dataclass
 from typing import Any
-from utils.conversationHelpers import Conversation, formatPrompt
+from utils.conversationHelpers import provideContextToModel
+from transformers import Conversation
 from handlers import listenHandler
+from time import time
 
 @dataclass
 class Context: 
@@ -10,18 +12,20 @@ class Context:
 	conversation: Conversation
 
 
-async def processMessage(messageType: str, content: str, context: Context, deviceType: str, pipeline: Any, tokenizer: Any):
+async def processMessage(messageType: str, content: str, context: Context, pipeline: Any, tokenizer: Any):
 	print('Incoming {} message from {}'.format(messageType, context.connection.id))
 	match messageType:
 		case 'lsn':
-			# Leaving convo context out for now as the new model might do something different
-			fullConversation = formatPrompt(context.conversation.history, 'You: ' + content)
-			response = listenHandler(fullConversation, tokenizer, pipeline, deviceType)
-			await context.connection.send('lsn::{}'.format(response['generated_text']))
+			startTime = time()
+			context.conversation.add_message({"role": "user", "content": content})
+			conversation = listenHandler(context.conversation, tokenizer, pipeline)
+			print(conversation)
+			response = conversation[-1]["content"]
+			await context.connection.send('lsn::{}'.format(response))
+			endTime = time()
+			print(f"Generated response in {endTime - startTime}s")
 		case 'ctx':
-			context.conversation.previousContext = context.conversation.context
-			context.conversation.context = content
-			context.conversation.contextUpdated = True
+			context.conversation.add_message(provideContextToModel(content))
 		case _:
 			print("Unknown command, skipping...")
 
