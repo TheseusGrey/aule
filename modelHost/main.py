@@ -5,17 +5,17 @@ from uuid import UUID
 import torch
 from utils.helpers import Context, processMessage
 import websockets
-from transformers import LlamaTokenizer, pipeline, Conversation
+from transformers import AutoTokenizer, pipeline, Conversation
 from utils.conversationHelpers import getChatTemplate, initialiseConversation
 
 # App config
 modelName = "PygmalionAI/pygmalion-2-7b"
 
 # Model Initialisation
-tokenizer = LlamaTokenizer.from_pretrained(modelName)
+tokenizer = AutoTokenizer.from_pretrained(modelName)
 # tokenizer.chat_template = getChatTemplate()
 pipeline = pipeline(
-    "conversational",
+    "text-generation",
     model=modelName,
     torch_dtype=torch.float16,
 	device="cuda",

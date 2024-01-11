@@ -8,7 +8,7 @@ personaFacts = [
 ]
 
 def initialiseConversation():
-	return {"role": "system", "content": f"Take on the role of {personaName}'s.  {' '.join(personaFacts)}\n<START>\n"}
+	return {"role": "system", "content": f"Take on the role of {personaName}.  {' '.join(personaFacts)}\n"}
 
 def provideContextToModel(context: str):
 	return {"role": "system", "content": context}

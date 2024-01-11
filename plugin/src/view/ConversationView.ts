@@ -23,9 +23,10 @@ const initialConversation = [
 export class AssistantView extends ItemView implements ConversationState {
 	private readonly settings: AuleSettings;
 	private readonly connection: WebSocket;
+
 	name: string
 	history: HistoryItem[]
-	lastMessage: number
+
 	container = this.containerEl.children[1];
 	rootEl = document.createElement('div');
 	title = this.rootEl.createEl('h1', { cls: 'title' });
@@ -38,7 +39,6 @@ export class AssistantView extends ItemView implements ConversationState {
 		this.connection = connection
 		this.name = this.formateConversationName();
 		this.history = initialConversation;
-		this.lastMessage = Date.now();
 		this.rootEl.addClass("aule-conversation");
 		this.title.setText(this.name);
 
@@ -55,22 +55,6 @@ export class AssistantView extends ItemView implements ConversationState {
 		}
 	}
 
-	public getViewType(): string {
-		return AssistantViewType;
-	}
-
-	public getDisplayText(): string {
-		return 'Aule';
-	}
-
-	public getIcon(): string {
-		return 'messages-square';
-	}
-
-	public load(): void {
-		super.load();
-		this.draw();
-	}
 
 	private formateConversationName = () => {
 		let conversationName = this.settings.conversationName;
@@ -116,8 +100,7 @@ export class AssistantView extends ItemView implements ConversationState {
 
 		inputButtonEl.onClickEvent(() => {
 			this.appendUserDialogue(inputEl.value);
-			this.lastMessage = Date.now();
-			this.connection.send(`lsn::${formatMessage(inputEl.value, true)}`);
+			this.connection.send(`lsn::${inputEl.value}`);
 			inputEl.value = "";
 		})
 	}
@@ -140,6 +123,23 @@ export class AssistantView extends ItemView implements ConversationState {
 
 		// This makes the scroll hit the bottom on every re-render
 		this.conversationEl.scrollTop = this.conversationEl.scrollHeight - this.conversationEl.clientHeight;
+	}
+
+	public getViewType(): string {
+		return AssistantViewType;
+	}
+
+	public getDisplayText(): string {
+		return 'Aule';
+	}
+
+	public getIcon(): string {
+		return 'messages-square';
+	}
+
+	public load(): void {
+		super.load();
+		this.draw();
 	}
 }
 
