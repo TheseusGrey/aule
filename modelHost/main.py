@@ -14,7 +14,8 @@ modelName = "PygmalionAI/pygmalion-2-7b"
 # Model Initialisation
 tokenizer = AutoTokenizer.from_pretrained(modelName)
 pipeline = pipeline(
-    "text-generation",
+    # "text-generation",
+    "conversational",
     model=modelName,
     torch_dtype=torch.float16,
 	device="cuda",

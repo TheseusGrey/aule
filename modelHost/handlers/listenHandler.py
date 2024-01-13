@@ -9,9 +9,10 @@ def formatConversation(messages: List[Dict[str, str]]):
 	return conversationText
 
 def listenHandler(conversation: Conversation, tokenizer: PreTrainedTokenizer | PreTrainedTokenizerFast, pipeline: Any):
-	formattedConversation = formatConversation(conversation.messages) + '<|model|>'
+	# formattedConversation = formatConversation(conversation.messages) + '<|model|>'
 	return pipeline(
-		formattedConversation,
+		conversation,
+		# formattedConversation,
 		do_sample=True,
 		top_k=10,
 		num_return_sequences=1,

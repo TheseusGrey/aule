@@ -13,3 +13,13 @@ def initialiseConversation():
 def provideContextToModel(context: str):
 	return {"role": "system", "content": context}
 
+def getChatTemplate(): 
+	return """{% for message in messages %}
+	{{ bos_token }}
+	{% if message['role'] == 'assistant'}
+		{{'<|model|>' + message['content']}}
+	{% else %}
+		{{'<|' + message['role'] + '|>' + message['content']}}
+	{% endif %}
+	{{ eos_token }}
+{% endfor %}"""

@@ -5,7 +5,6 @@ from utils.conversationHelpers import provideContextToModel
 from transformers import Conversation
 from handlers import listenHandler
 from time import time
-import re
 
 
 @dataclass
@@ -22,11 +21,11 @@ async def processMessage(messageType: str, content: str, context: Context, pipel
 			startTime = time()
 			context.conversation.add_message({"role": "user", "content": content})
 			conversation = listenHandler(context.conversation, tokenizer, pipeline)
-			response = conversation[0]["generated_text"].split("<|model|>")[-1]
-			context.conversation.add_message({"role": "assistant", "content": response})
+			response = conversation.messages[-1]['content']
+			print(conversation.messages[-1])
 			await context.connection.send('lsn::{}'.format(response))
 			endTime = time()
-			print(f"Generated response in {endTime - startTime}s")
+			print(f"Generated response in {f'{(endTime - startTime):5.2f}'}s")
 		case 'ctx':
 			context.conversation.add_message(provideContextToModel(content))
 		case _:
