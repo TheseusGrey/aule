@@ -13,7 +13,3 @@ def initialiseConversation():
 def provideContextToModel(context: str):
 	return {"role": "system", "content": context}
 
-def getChatTemplate(): 
-	return """{% for message in messages %}
-    {{'<|' + message['role'] + '|>' + message['content']}}
-{% endfor %}"""

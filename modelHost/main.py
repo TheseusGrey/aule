@@ -6,14 +6,13 @@ import torch
 from utils.helpers import Context, processMessage
 import websockets
 from transformers import AutoTokenizer, pipeline, Conversation
-from utils.conversationHelpers import getChatTemplate, initialiseConversation
+from utils.conversationHelpers import initialiseConversation
 
 # App config
 modelName = "PygmalionAI/pygmalion-2-7b"
 
 # Model Initialisation
 tokenizer = AutoTokenizer.from_pretrained(modelName)
-# tokenizer.chat_template = getChatTemplate()
 pipeline = pipeline(
     "text-generation",
     model=modelName,
@@ -28,7 +27,7 @@ connections: Dict[UUID, Context]  = {}
 async def handler(websocket: websockets.WebSocketServerProtocol):
 	if websocket.id not in connections:
 		newConversation = Conversation([initialiseConversation()], websocket.id)
-		connections[websocket.id] = Context(websocket, newConversation)
+		connections[websocket.id] = Context(websocket, newConversation, "")
 	while True:
 		try:
 			message = await websocket.recv()
