@@ -5,7 +5,7 @@ from uuid import UUID
 import torch
 from utils.helpers import Context, processMessage
 import websockets
-from transformers import AutoTokenizer, pipeline, Conversation
+from transformers import AutoTokenizer, AutoModelForCausalLM, pipeline, Conversation
 from utils.conversationHelpers import initialiseConversation
 
 # App config
@@ -14,8 +14,7 @@ modelName = "PygmalionAI/pygmalion-2-7b"
 # Model Initialisation
 tokenizer = AutoTokenizer.from_pretrained(modelName)
 pipeline = pipeline(
-    # "text-generation",
-    "conversational",
+    "text-generation",
     model=modelName,
     torch_dtype=torch.float16,
 	device="cuda",
@@ -29,6 +28,7 @@ async def handler(websocket: websockets.WebSocketServerProtocol):
 	if websocket.id not in connections:
 		newConversation = Conversation([initialiseConversation()], websocket.id)
 		connections[websocket.id] = Context(websocket, newConversation, "")
+		print(connections)
 	while True:
 		try:
 			message = await websocket.recv()

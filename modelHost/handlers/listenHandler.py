@@ -4,15 +4,15 @@ from transformers import PreTrainedTokenizer, PreTrainedTokenizerFast, Conversat
 def formatConversation(messages: List[Dict[str, str]]):
 	conversationText = ""
 	for message in messages:
-		conversationText += f"<|{message['role']}|>{message['content']}<|{message['role']}|>\n"
+		role = message['role'] if message['role'] != 'assistant' else 'model'
+		conversationText += f"<|{role}|>{message['content']}\n"
 
 	return conversationText
 
 def listenHandler(conversation: Conversation, tokenizer: PreTrainedTokenizer | PreTrainedTokenizerFast, pipeline: Any):
-	# formattedConversation = formatConversation(conversation.messages) + '<|model|>'
+	formattedConversation = formatConversation(conversation.messages) + '<|model|>'
 	return pipeline(
-		conversation,
-		# formattedConversation,
+		formattedConversation,
 		do_sample=True,
 		top_k=10,
 		num_return_sequences=1,

@@ -47,7 +47,7 @@ export class AssistantView extends ItemView implements ConversationState {
 			console.log(`Got a ${command} message from Aule saying: ${content}`)
 			switch (command) {
 				case 'lsn':
-					this.appendAssistantDialogue(content);
+					this.appendToHistory({ prefix: '<', dialogue: dialogue });
 					break;
 				default:
 					break;
@@ -85,21 +85,21 @@ export class AssistantView extends ItemView implements ConversationState {
 		this.renderConversationHistory();
 	}
 
-	appendUserDialogue(dialogue: string) {
-		this.appendToHistory({ prefix: '>', dialogue: dialogue });
-	}
-
-	appendAssistantDialogue(dialogue: string) {
-		this.appendToHistory({ prefix: '<', dialogue: dialogue });
-	}
-
 	private renderUserInput() {
 		const inputEl = this.inputContainer.createEl("textarea", { cls: 'aule-input-area' });
 		const inputButtonEl = this.inputContainer.createEl("button", { cls: 'aule-input-button' });
 		setIcon(inputButtonEl, this.getIcon());
 
+		inputEl.onkeydown = e => {
+			if (e.key !== 'Enter') return;
+			e.preventDefault();
+			this.appendToHistory({ prefix: '>', dialogue: inputEl.value });
+			this.connection.send(`lsn::${inputEl.value}`);
+			inputEl.value = "";
+		};
+
 		inputButtonEl.onClickEvent(() => {
-			this.appendUserDialogue(inputEl.value);
+			this.appendToHistory({ prefix: '>', dialogue: inputEl.value });
 			this.connection.send(`lsn::${inputEl.value}`);
 			inputEl.value = "";
 		})

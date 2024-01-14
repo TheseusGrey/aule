@@ -21,8 +21,8 @@ async def processMessage(messageType: str, content: str, context: Context, pipel
 			startTime = time()
 			context.conversation.add_message({"role": "user", "content": content})
 			conversation = listenHandler(context.conversation, tokenizer, pipeline)
-			response = conversation.messages[-1]['content']
-			print(conversation.messages[-1])
+			response = conversation[0]['generated_text'].split('<|model|>')[-1]
+			print(response)
 			await context.connection.send('lsn::{}'.format(response))
 			endTime = time()
 			print(f"Generated response in {f'{(endTime - startTime):5.2f}'}s")
