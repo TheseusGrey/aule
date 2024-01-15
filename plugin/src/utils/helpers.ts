@@ -1,5 +1,3 @@
-export const formatContext = (context: string) => `<|system|>${context}`
-export const formatMessage = (message: string, expectResponse?: boolean) => `<|user|>${message}${expectResponse && "<|model|>"}`
 
 export const commands = ['lsn', 'ctx'] as const
 export type Command = typeof commands[number]
