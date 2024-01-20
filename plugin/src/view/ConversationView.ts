@@ -8,7 +8,9 @@ import {
 import { mount, RedomComponent } from 'redom';
 import { parseMessage } from 'src/utils/helpers';
 import { AuleSettings } from '../settings';
+import Messages from './components/Messages';
 import Title from './components/Title';
+import UserInput from './components/UserInput';
 import { ConversationState, HistoryItem } from './ConversationState';
 
 export const AssistantViewType = 'aule-assistant-toolbar';
@@ -31,6 +33,8 @@ export class AssistantView extends ItemView implements ConversationState {
 	container = this.containerEl.children[1];
 	rootEl = document.createElement('div');
 	title: Title;
+	conversation: Messages;
+	userInput: UserInput;
 
 	conversationEl = this.rootEl.createDiv({ cls: 'aule-conversation-wrapper' });
 	inputContainer = this.rootEl.createDiv({ cls: 'aule-input-container' });
@@ -38,13 +42,19 @@ export class AssistantView extends ItemView implements ConversationState {
 	constructor(leaf: WorkspaceLeaf, settings: AuleSettings, connection: WebSocket) {
 		super(leaf);
 		this.settings = settings;
-		this.connection = connection
-		this.title = new Title(this.settings, this.formateConversationName());
-		mount(this.rootEl, this.title);
-
+		this.connection = connection;
 		this.name = this.formateConversationName();
 		this.history = initialConversation;
+
+		this.title = new Title(this.settings, this.name);
+		this.conversation = new Messages(this.settings, this.history);
+		this.userInput = new UserInput(this.settings);
+
 		this.rootEl.addClass("aule-conversation");
+		mount(this.rootEl, this.title);
+		mount(this.rootEl, this.conversation);
+		mount(this.rootEl, this.userInput);
+
 
 		this.connection.onmessage = event => {
 			const { command, content } = parseMessage(event.data)
