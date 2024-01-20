@@ -47,8 +47,8 @@ export class AssistantView extends ItemView implements ConversationState {
 		this.history = initialConversation;
 
 		this.title = new Title(this.settings, this.name);
-		this.conversation = new Messages(this.settings, this.history);
-		this.userInput = new UserInput(this.settings);
+		this.conversation = new Messages(this.settings, this.history, this.appendToHistory);
+		this.userInput = new UserInput(this.settings, this.connection, this.appendToHistory);
 
 		this.rootEl.addClass("aule-conversation");
 		mount(this.rootEl, this.title);
