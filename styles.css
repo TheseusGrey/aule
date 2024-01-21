@@ -13,18 +13,55 @@
   width: var(--img-size);
   height: var(--img-size);
 }
-
+/* conversation view */
 .aule-conversation {
 	display: grid;
 	grid-template-rows: min-content 1fr 4rem;
 	height: 100%;
+	gap: 0.5rem;
+	padding-bottom: 1.5rem;
 }
 
-.aule-conversation-wrapper {
+.aule-conversation button:hover {
+  cursor: pointer;
+  background-color: rgb(var(--ctp-pink));
+  color: var(--text-on-accent);
+}
+
+.aule-conversation button:active {
+	background-color: initial;
+	color: initial;
+}
+
+/* conversation title */
+.aule-title-bar {
+	display: grid;
+	grid-template-columns: 1fr min-content;
+	align-items: center;
+}
+
+.aule-title-bar > h2 {
+	display: inline-block;
+	margin: 0;
+}
+
+.aule-title-bar > button {
+	height: 100%;
+	font-weight: bold;
+	--icon-size: 1.6rem;
+}
+
+/* conversation messages */
+.aule-conversation-history {
 	overflow: scroll;
 }
 
-.aule-input-container {
+.aule-message {
+
+}
+
+/* user input */
+.aule-user-input {
 	display: grid;
 	grid-template-columns: 1fr var(--size-4-18);
 	grid-template-rows: 4rem;
@@ -34,39 +71,8 @@
 	padding-bottom: var(--size-4-12);
 }
 
-.aule-input-area {
-	font-size: 16px;
-	font-weight: 600;
-}
-.aule-input-button {
+.aule-user-input > button {
 	height: 100%;
 	--icon-size: 3rem;
-}
-
-.aule-input-button:hover {
-  cursor: pointer;
-  background-color: rgb(var(--ctp-pink));
-  color: var(--text-on-accent);
-}
-
-.aule-input-button:active {
-	background-color: initial;
-	color: initial;
-}
-
-.dialogue-plugin-message {
-	border-radius: var(--clickable-icon-radius);
-	background-color: var(--background-secondary-alt);
-}
-
-/* messages from first dialogue participant */
-.dialogue-plugin-message[data-participant-id="1"] {
-}
-
-/* messages from second dialogue participant */
-.dialogue-plugin-message[data-participant-id="2"] {
-}
-
-.dialogue-plugin-message-content {
 }
 

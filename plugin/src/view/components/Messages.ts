@@ -30,7 +30,7 @@ export default class Messages implements RedomComponent {
 
 	el = el('.aule-message-history');
 
-	constructor(settings: AuleSettings) {
+	constructor(settings: AuleSettings, messageHistory: HistoryItem[], onMessage: (newMessage: HistoryItem) => void) {
 		this.pluginSettings = settings;
 	}
 

@@ -43,7 +43,6 @@ export class AssistantView extends ItemView implements ConversationState {
 		this.history = initialConversation;
 
 		this.rootEl = el('div.aule-conversation');
-		this.draw();
 
 		this.connection.onmessage = event => {
 			const { command, content } = parseMessage(event.data)
