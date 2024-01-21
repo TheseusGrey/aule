@@ -17,7 +17,7 @@ export default class Title implements RedomComponent {
 
 		this.title.textContent = title || this.pluginSettings.conversationName;
 
-		setIcon(this.clearButton, 'clear button icon of some kind');
+		setIcon(this.clearButton, 'mail-plus');
 
 		mount(this.el, this.title);
 		mount(this.el, this.clearButton);

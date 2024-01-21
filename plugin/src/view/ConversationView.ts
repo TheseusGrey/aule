@@ -5,7 +5,7 @@ import {
 	setIcon,
 	WorkspaceLeaf
 } from 'obsidian';
-import { mount, RedomComponent } from 'redom';
+import { el, mount } from 'redom';
 import { parseMessage } from 'src/utils/helpers';
 import { AuleSettings } from '../settings';
 import Messages from './components/Messages';
@@ -30,14 +30,10 @@ export class AssistantView extends ItemView implements ConversationState {
 	name: string;
 	history: HistoryItem[];
 
-	container = this.containerEl.children[1];
-	rootEl = document.createElement('div');
-	title: Title;
-	conversation: Messages;
-	userInput: UserInput;
-
-	conversationEl = this.rootEl.createDiv({ cls: 'aule-conversation-wrapper' });
-	inputContainer = this.rootEl.createDiv({ cls: 'aule-input-container' });
+	rootEl: HTMLElement;
+	private title: Title;
+	private conversation: Messages;
+	private userInput: UserInput;
 
 	constructor(leaf: WorkspaceLeaf, settings: AuleSettings, connection: WebSocket) {
 		super(leaf);
@@ -46,15 +42,8 @@ export class AssistantView extends ItemView implements ConversationState {
 		this.name = this.formateConversationName();
 		this.history = initialConversation;
 
-		this.title = new Title(this.settings, this.name);
-		this.conversation = new Messages(this.settings, this.history, this.appendToHistory);
-		this.userInput = new UserInput(this.settings, this.connection, this.appendToHistory);
-
-		this.rootEl.addClass("aule-conversation");
-		mount(this.rootEl, this.title);
-		mount(this.rootEl, this.conversation);
-		mount(this.rootEl, this.userInput);
-
+		this.rootEl = el('div.aule-conversation');
+		this.draw();
 
 		this.connection.onmessage = event => {
 			const { command, content } = parseMessage(event.data)
@@ -67,6 +56,17 @@ export class AssistantView extends ItemView implements ConversationState {
 					break;
 			}
 		}
+	}
+
+	private readonly draw = (): void => {
+		this.title = new Title(this.settings, this.name);
+		this.conversation = new Messages(this.settings, this.history, this.appendToHistory);
+		this.userInput = new UserInput(this.settings, this.connection, this.appendToHistory);
+
+		mount(this.rootEl, this.title);
+		mount(this.rootEl, this.conversation);
+		mount(this.rootEl, this.userInput);
+		this.containerEl.children[1].appendChild(this.rootEl);
 	}
 
 	private formateConversationName = () => {
@@ -82,12 +82,6 @@ export class AssistantView extends ItemView implements ConversationState {
 		return conversationName;
 	}
 
-	private readonly draw = (): void => {
-		this.renderUserInput();
-		this.renderConversationHistory();
-		this.container.appendChild(this.rootEl);
-	}
-
 	setConversationName(name: string) {
 		this.name = name;
 		this.title.update(name);
@@ -95,47 +89,7 @@ export class AssistantView extends ItemView implements ConversationState {
 
 	appendToHistory(newItem: HistoryItem) {
 		this.history.push(newItem);
-		this.renderConversationHistory();
-	}
-
-	private renderUserInput() {
-		const inputEl = this.inputContainer.createEl("textarea", { cls: 'aule-input-area' });
-		const inputButtonEl = this.inputContainer.createEl("button", { cls: 'aule-input-button' });
-		setIcon(inputButtonEl, this.getIcon());
-
-		inputEl.onkeydown = e => {
-			if (e.key !== 'Enter') return;
-			e.preventDefault();
-			this.appendToHistory({ prefix: '>', dialogue: inputEl.value });
-			this.connection.send(`lsn::${inputEl.value}`);
-			inputEl.value = "";
-		};
-
-		inputButtonEl.onClickEvent(() => {
-			this.appendToHistory({ prefix: '>', dialogue: inputEl.value });
-			this.connection.send(`lsn::${inputEl.value}`);
-			inputEl.value = "";
-		})
-	}
-
-	private renderConversationHistory() {
-		this.conversationEl.empty();
-
-		const convoHistory = this.history
-			.map(item => `${item.prefix} ${item.dialogue}`)
-			.join('\n')
-			.concat('\n```');
-
-		MarkdownRenderer.render(
-			this.app,
-			convoHistory,
-			this.conversationEl,
-			this.settings.conversationsFolder.concat(this.name),
-			this
-		);
-
-		// This makes the scroll hit the bottom on every re-render
-		this.conversationEl.scrollTop = this.conversationEl.scrollHeight - this.conversationEl.clientHeight;
+		// this.renderConversationHistory();
 	}
 
 	public getViewType(): string {
