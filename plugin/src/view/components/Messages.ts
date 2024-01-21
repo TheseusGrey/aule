@@ -27,27 +27,16 @@ import { HistoryItem } from "../ConversationState";
 export default class Messages implements RedomComponent {
 	private readonly pluginSettings: AuleSettings;
 
-	private title: HTMLElement;
-	private clearButton: HTMLElement;
 
-	el = el('.aule-title-bar');
+	el = el('.aule-message-history');
 
-	constructor(settings: AuleSettings, history: HistoryItem[] = [], onMessage: (newMessage: HistoryItem) => void) {
+	constructor(settings: AuleSettings) {
 		this.pluginSettings = settings;
-		this.title = el('h2');
-		this.clearButton = el('button');
-
-
-		setIcon(this.clearButton, 'clear button icon of some kind');
-
-		mount(this.el, this.title);
-		mount(this.el, this.clearButton);
 	}
 
 	setupEventListeners() {
 	}
 
-	update(newTitle: string) {
-		this.title.textContent = newTitle;
+	update() {
 	}
 }
