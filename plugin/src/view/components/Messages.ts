@@ -1,65 +1,9 @@
 
-import { App, Component, ItemView, MarkdownRenderer } from "obsidian";
+import { App, Component, MarkdownRenderer } from "obsidian";
 import { el, mount, RedomComponent } from "redom";
 import { AuleSettings } from "src/settings";
-import { HistoryItem } from "../ConversationState";
+import { HistoryItem, MessageConfig } from "../ConversationState";
 import { AssistantView } from "../ConversationView";
-
-//private renderConversationHistory() {
-//		this.conversationEl.empty();
-//
-//		const convoHistory = this.history
-//			.map(item => `${item.prefix} ${item.dialogue}`)
-//			.join('\n')
-//			.concat('\n```');
-//
-//		MarkdownRenderer.render(
-//			this.app,
-//			convoHistory,
-//			this.conversationEl,
-//			this.settings.conversationsFolder.concat(this.name),
-//			this
-//		);
-//  
-//		// This makes the scroll hit the bottom on every re-render
-//		this.conversationEl.scrollTop = this.conversationEl.scrollHeight - this.conversationEl.clientHeight;
-//	}
-
-export default class Messages implements RedomComponent {
-	private readonly pluginSettings: AuleSettings;
-	private readonly markdownRenderConfig: MarkdownRenderConfig;
-	private readonly messageHistory: HTMLElement[];
-
-	el = el('.aule-message-history');
-
-	constructor(
-		settings: AuleSettings,
-		initialConversation: HistoryItem[],
-		viewInfo: AssistantView
-	) {
-		this.pluginSettings = settings;
-		this.markdownRenderConfig = {
-			app: viewInfo.app,
-			sourcePath: this.pluginSettings.conversationsFolder.concat(viewInfo.name),
-			component: viewInfo,
-		};
-
-		// Here we map the inital list (I.e. if we're loading from a file or something)
-		// to our message elements
-	}
-
-	update(newMessage: HistoryItem) {
-		// This will be called on getting a new message
-		// We create just render and append, rather than
-		// re-render the entire list.
-	}
-}
-
-type MessageConfig = {
-	author?: string,
-	participant?: 'user' | 'model',
-	showAuthor?: boolean,
-}
 
 type MarkdownRenderConfig = {
 	app: App,
@@ -67,23 +11,41 @@ type MarkdownRenderConfig = {
 	component: Component,
 }
 
+export default function messages(settings: AuleSettings, conversationHistory: HistoryItem[], view: AssistantView) {
+	const markdownRenderConfig = {
+		app: view.app,
+		sourcePath: settings.conversationsFolder.concat(view.name),
+		component: view,
+	};
+
+	const root = el('.aule-message-history');
+
+	// This lets us intersperse the items with hr tags to give messages better separation
+	const firstItem = conversationHistory.shift();
+	if (firstItem) mount(root, new Message(firstItem, markdownRenderConfig))
+	conversationHistory.map(item => new Message(item, markdownRenderConfig)).forEach(element => {
+		mount(root, el('hr'))
+		mount(root, element)
+	});
+
+	return root;
+}
+
 class Message implements RedomComponent {
 	private readonly messageHeader: HTMLElement;
 
 	el = el('.aule-message');
 
-	constructor(messageContent: string, markdownRenderConfig: MarkdownRenderConfig, messageConfig?: MessageConfig) {
-		this.el.dataset.participant = messageConfig?.participant || 'user';
+	constructor(message: HistoryItem, markdownRenderConfig: MarkdownRenderConfig) {
+		this.el.dataset.participant = message.metadata.participant;
 
-		if (messageConfig?.author && messageConfig.showAuthor) {
-			this.messageHeader = el('h4');
-			this.messageHeader.textContent = messageConfig.author;
-			mount(this.el, this.messageHeader);
-		}
+		this.messageHeader = el('h4');
+		this.messageHeader.textContent = message.metadata.author;
+		mount(this.el, this.messageHeader);
 
 		MarkdownRenderer.render(
 			markdownRenderConfig.app,
-			messageContent,
+			message.dialogue,
 			this.el,
 			markdownRenderConfig.sourcePath,
 			markdownRenderConfig.component

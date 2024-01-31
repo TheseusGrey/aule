@@ -1,53 +1,48 @@
 
 
 import { setIcon } from "obsidian";
-import { el, mount, RedomComponent } from "redom";
-import { AuleSettings } from "src/settings";
+import { el, mount } from "redom";
+import { assistantName, AuleSettings } from "src/settings";
 import { HistoryItem } from "../ConversationState";
 
+type MessageHandler = (newMessage: HistoryItem) => void
+export default function userInput(settings: AuleSettings, connection: WebSocket, onMessage: MessageHandler) {
+	const root = el('.aule-user-input');
+	const inputArea = el('textarea');
+	const submitButton = el('button');
 
-export default class UserInput implements RedomComponent {
-	private readonly pluginSettings: AuleSettings;
-	private readonly connection: WebSocket;
 
-	private inputArea: HTMLTextAreaElement;
-	private submitButton: HTMLElement;
-	private onMessage: (newMessage: HistoryItem) => void;
+	submitButton.onkeydown = e => {
+		if (e.key !== 'Enter') return;
+		e.preventDefault();
 
-	el = el('.aule-user-input');
+		const messageText = inputArea.value;
+		onMessage({
+			dialogue: messageText, metadata: {
+				author: 'Me',
+				participant: 'user',
+			}
+		});
+		connection.send(`lsn::${messageText}`);
+		inputArea.value = "";
+	};
 
-	constructor(settings: AuleSettings, connection: WebSocket, onMessage: (newMessage: HistoryItem) => void) {
-		this.pluginSettings = settings;
-		this.connection = connection;
-		this.onMessage = onMessage;
+	submitButton.onClickEvent(() => {
+		const messageText = inputArea.value;
+		onMessage({
+			dialogue: messageText, metadata: {
+				author: assistantName,
+				participant: 'model',
+			}
+		});
+		connection.send(`lsn::${messageText}`);
+		inputArea.value = "";
+	})
 
-		this.inputArea = el('textarea');
-		this.submitButton = el('button');
+	setIcon(submitButton, 'messages-square')
+	mount(root, inputArea);
+	mount(root, submitButton);
 
-		setIcon(this.submitButton, 'messages-square')
-
-		mount(this.el, this.inputArea);
-		mount(this.el, this.submitButton);
-	}
-
-	setupEventListeners() {
-		this.submitButton.onkeydown = e => {
-			if (e.key !== 'Enter') return;
-			e.preventDefault();
-
-			const messageText = this.inputArea.value;
-			this.onMessage({ prefix: '>', dialogue: messageText });
-			this.connection.send(`lsn::${messageText}`);
-			this.inputArea.value = "";
-		};
-
-		this.submitButton.onClickEvent(() => {
-			const messageText = this.inputArea.value;
-			this.onMessage({ prefix: '>', dialogue: messageText });
-			this.connection.send(`lsn::${messageText}`);
-			this.inputArea.value = "";
-		})
-	}
-
-	update() { }
+	return root;
 }
+

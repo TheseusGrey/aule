@@ -1,7 +1,11 @@
 
+export type MessageConfig = {
+	author: string,
+	participant: 'user' | 'model',
+}
 
 export type HistoryItem = {
-	prefix: string,
+	metadata: MessageConfig,
 	dialogue: string,
 }
 

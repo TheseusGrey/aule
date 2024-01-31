@@ -1,26 +1,25 @@
 
 import {
 	ItemView,
-	MarkdownRenderer,
-	setIcon,
 	WorkspaceLeaf
 } from 'obsidian';
 import { el, mount } from 'redom';
 import { parseMessage } from 'src/utils/helpers';
-import { AuleSettings } from '../settings';
-import Messages from './components/Messages';
+import { assistantName, AuleSettings } from '../settings';
+import messages from './components/Messages';
 import Title from './components/Title';
-import UserInput from './components/UserInput';
+import userInput from './components/UserInput';
 import { ConversationState, HistoryItem } from './ConversationState';
 
 export const AssistantViewType = 'aule-assistant-toolbar';
 
-const initialConversation = [
-	{ prefix: '', dialogue: '```dialogue' },
-	{ prefix: 'left:', dialogue: 'Aulë' },
-	{ prefix: 'right:', dialogue: 'Me' },
-	{ prefix: '', dialogue: '' },
-	{ prefix: '#', dialogue: 'Send a message to get this conversation rolling!' }
+const initialConversation: HistoryItem[] = [
+	{
+		dialogue: 'Send a message to get this conversation rolling! :D', metadata: {
+			author: assistantName,
+			participant: 'model',
+		}
+	}
 ]
 
 
@@ -32,8 +31,8 @@ export class AssistantView extends ItemView implements ConversationState {
 
 	rootEl: HTMLElement;
 	private title: Title;
-	private conversation: Messages;
-	private userInput: UserInput;
+	private conversation: HTMLElement;
+	private userInput: HTMLElement;
 
 	constructor(leaf: WorkspaceLeaf, settings: AuleSettings, connection: WebSocket) {
 		super(leaf);
@@ -49,7 +48,12 @@ export class AssistantView extends ItemView implements ConversationState {
 			console.log(`Got a ${command} message from Aule saying: ${content}`)
 			switch (command) {
 				case 'lsn':
-					this.appendToHistory({ prefix: '<', dialogue: content });
+					this.appendToHistory({
+						dialogue: content, metadata: {
+							author: assistantName,
+							participant: 'model'
+						}
+					});
 					break;
 				default:
 					break;
@@ -59,8 +63,8 @@ export class AssistantView extends ItemView implements ConversationState {
 
 	private readonly draw = (): void => {
 		this.title = new Title(this.settings, this.name);
-		this.conversation = new Messages(this.settings, this.history, this.appendToHistory);
-		this.userInput = new UserInput(this.settings, this.connection, this.appendToHistory);
+		this.conversation = messages(this.settings, this.history, this);
+		this.userInput = userInput(this.settings, this.connection, this.appendToHistory);
 
 		mount(this.rootEl, this.title);
 		mount(this.rootEl, this.conversation);
@@ -87,8 +91,8 @@ export class AssistantView extends ItemView implements ConversationState {
 	}
 
 	appendToHistory(newItem: HistoryItem) {
+		console.log(this.history);
 		this.history.push(newItem);
-		// this.renderConversationHistory();
 	}
 
 	public getViewType(): string {
