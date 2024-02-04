@@ -1,8 +1,7 @@
-
 import { App, Component, MarkdownRenderer } from "obsidian";
 import { el, mount, RedomComponent } from "redom";
 import { AuleSettings } from "src/settings";
-import { HistoryItem, MessageConfig } from "../ConversationState";
+import { HistoryItem } from "../ConversationState";
 import { AssistantView } from "../ConversationView";
 
 type MarkdownRenderConfig = {

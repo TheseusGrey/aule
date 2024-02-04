@@ -62,9 +62,9 @@ export class AssistantView extends ItemView implements ConversationState {
 	}
 
 	private readonly draw = (): void => {
-		this.title = new Title(this.settings, this.name);
+		this.title = new Title(this.settings, this.connection, this.history, this.name);
 		this.conversation = messages(this.settings, this.history, this);
-		this.userInput = userInput(this.settings, this.connection, this.appendToHistory);
+		this.userInput = userInput(this.settings, this.connection, this.appendToHistory.bind(this));
 
 		mount(this.rootEl, this.title);
 		mount(this.rootEl, this.conversation);
@@ -91,6 +91,7 @@ export class AssistantView extends ItemView implements ConversationState {
 	}
 
 	appendToHistory(newItem: HistoryItem) {
+		console.log(this);
 		console.log(this.history);
 		this.history.push(newItem);
 	}
