@@ -23,7 +23,7 @@ pipeline = pipeline(
 # Websocket Connections
 connections: Dict[UUID, Context]  = {}
 
-# Message Handler
+
 async def handler(websocket: websockets.WebSocketServerProtocol):
 	if websocket.id not in connections:
 		newConversation = Conversation([initialiseConversation()], websocket.id)

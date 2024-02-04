@@ -1,7 +1,7 @@
 from websockets import WebSocketServerProtocol
 from dataclasses import dataclass
 from typing import Any
-from utils.conversationHelpers import provideContextToModel
+from utils.conversationHelpers import initialiseConversation, provideContextToModel
 from transformers import Conversation
 from handlers import listenHandler
 from time import time
@@ -26,6 +26,8 @@ async def processMessage(messageType: str, content: str, context: Context, pipel
 			await context.connection.send('lsn::{}'.format(response))
 			endTime = time()
 			print(f"Generated response in {f'{(endTime - startTime):5.2f}'}s")
+		case 'clr':
+			context.conversation = Conversation([initialiseConversation()], context.connection.id)
 		case 'ctx':
 			context.conversation.add_message(provideContextToModel(content))
 		case _:
