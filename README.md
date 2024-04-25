@@ -25,3 +25,8 @@ I've been running this on a 3060ti along side a bunch of other apps
 - Initial response times can be around `~100-150` seconds but it can come down to as quick as `~10` seconds depending on the response size.
 - I haven't tuned the parameters at all so the responses can be alil off sometimes. But generally the responses will make sense in an actual conversation
 - I haven't tried to have any conversations longer than a couple messages yet, so I'm unsure how it will respond to and retain information for longer stretches.
+
+## Beep Boop
+
+If there is someone out there other than me looking at this repo, I'm leaving this project alone for a while. Primarily because local LLMs aren't currently feasible in a usecase that requires to keep up with you're ability to write your thoughts down. Not to mention when testing I've found LLMs definitely struggle with the novel output required for more creative writing tasks, I don't want to fight an LLM to get new ideas out of it.
+
